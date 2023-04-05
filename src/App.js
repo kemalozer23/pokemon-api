@@ -14,6 +14,9 @@ function App() {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
 
+  const [superTypes, setSuperTypes] = useState([]);
+  const [types, setTypes] = useState([]);
+
   const [superType, setSuperType] = useState('Pokemon');
   const [type, setType] = useState('Water');
 
@@ -28,7 +31,6 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       const url = `https://api.pokemontcg.io/v2/cards?page=${page}&pageSize=9&orderBy=name&q=supertype:${superType} types:${type}`
-      console.log(url);
       const result = await axios.get(url).catch(error => console.error(error));
       setData(result.data.data)
     };
@@ -36,34 +38,42 @@ function App() {
     fetchData();
   }, [page, superType, type]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const superTypesUrl = 'https://api.pokemontcg.io/v2/supertypes'
+      const typesUrl = 'https://api.pokemontcg.io/v2/types'
+      const superTypesResult = await axios.get(superTypesUrl).catch(error => console.log(error))
+      const typesResult = await axios.get(typesUrl).catch(error => console.log(error))
+      setSuperTypes(superTypesResult.data.data)
+      setTypes(typesResult.data.data)
+    }
+
+    fetchData();
+  }, [])
+
   if (!data) return null;
 
   return (
     <>
       <Header />
+      <div className='border p-5 bg-gray-100 flex justify-center items-center'>
+        <div className='grid grid-cols-2 pt-5 space-x-5'>
+          <div className="w-1/4">
+            <Select label="Supertype" value={superType} onChange={(value) => setSuperType(value)}>
+              {superTypes.map(i => (
+                <Option key={i} value={i}>{i}</Option>
+              ))}
+            </Select>
+          </div>
 
-      <div className="w-1/4">
-        <Select label="Supertype" value={superType} onChange={(value) => setSuperType(value)}>
-          <Option value='Energy'>Energy</Option>
-          <Option value='Pokemon'>Pokemon</Option>
-          <Option value='Trainer'>Trainer</Option>
-        </Select>
-      </div>
-
-      <div className="w-1/4 pt-5">
-        <Select label="Type" value={type} onChange={(value) => setType(value)}>
-          <Option value='Colorless'>Colorless</Option>
-          <Option value='Darkness'>Darkness</Option>
-          <Option value='Dragon'>Dragon</Option>
-          <Option value='Fairy'>Fairy</Option>
-          <Option value='Fighting'>Fighting</Option>
-          <Option value='Fire'>Fire</Option>
-          <Option value='Grass'>Grass</Option>
-          <Option value='Lightning'>Lightning</Option>
-          <Option value='Metal'>Metal</Option>
-          <Option value='Psychic'>Psychic</Option>
-          <Option value='Water'>Water</Option>
-        </Select>
+          <div className="w-1/4">
+            <Select label="Type" value={type} onChange={(value) => setType(value)}>
+              {types.map(i => (
+                <Option key={i} value={i}>{i}</Option>
+              ))}
+            </Select>
+          </div>
+        </div>
       </div>
 
       <Body data={data} />

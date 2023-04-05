@@ -7,7 +7,9 @@ module.exports = withMT({
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    fontFamily: {
+      display: ["'Press Start 2P'", 'Sans'],
+    },
   },
   plugins: [],
 })
